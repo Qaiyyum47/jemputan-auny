@@ -129,33 +129,29 @@ function handleSwipe() {
   }
 }
 
+
 // ===== UCAPAN FETCH =====
-fetch("https://script.google.com/macros/s/AKfycbxc7TZR9WXtn21_B20gctGh5QART7GUw55V3TYdiFTOJ34RibpcbfRFoe-TZCdc_D_1Dw/exec")
+fetch("https://script.google.com/macros/s/AKfycbxGXAngrkoFyNvh3HEjIUCMgtb7UL0yHH5jYUAW9qznNfm6BfBWUS77CFWIzyWHRmCcDA/exec")
   .then(res => res.json())
   .then(data => {
-    const list = document.getElementById("ucapan-list");
-    const count = document.getElementById("guest-count");
+    const list   = document.getElementById("ucapan-list");
+    const count  = document.getElementById("guest-count");
     const count1 = document.getElementById("guest-count-no");
 
-
-    const createEntry = (item) => {
+    const addEntry = ({ message, name }) => {
+      if (!message || !message.trim()) return;
       const p = document.createElement("p");
-      p.innerHTML = `<i>"${item.message}"</i><br><strong>${item.name}</strong>`;
-      return p;
+      p.innerHTML = `<i>"${message}"</i><br><strong>${name}</strong>`;
+      list.appendChild(p);
     };
-
-    for (let i = 0; i < 2; i++) {
-      [...data].reverse().forEach(item => list.appendChild(createEntry(item)));
-    }
-
+    [...data].reverse().forEach(addEntry);     
     list.style.animationDuration = `${list.scrollHeight / 30}s`;
-    
 
-    const hadirCount = data.filter(item => item.hadir === "Hadir").length;
-    const xhadirCount = data.filter(item => item.hadir === "Tidak Hadir").length;
-    count.textContent = `${hadirCount + 100}`;
-    count1.textContent = `${xhadirCount}`;
-    
+    const totalGuest = data.reduce((s, r) => s + (+r.bilangan || 0), 0);
+    const noGuest    = data.filter(r => r.hadir === "Tidak Hadir").length;
+
+    count.textContent  = totalGuest + 100; 
+    count1.textContent = noGuest;
   })
   .catch(err => console.error("Failed to fetch ucapan:", err));
 
